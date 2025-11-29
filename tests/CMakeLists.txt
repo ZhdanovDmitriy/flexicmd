@@ -1,0 +1,4 @@
+enable_testing()
+add_executable(CommandEngineTest test_commands.cpp)
+target_link_libraries(CommandEngineTest PRIVATE CommandEngineLib)
+add_test(NAME RunCommandEngineTest COMMAND CommandEngineTest)
