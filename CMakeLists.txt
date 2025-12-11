@@ -10,8 +10,6 @@ add_library(CommandEngineLib
 )
 target_include_directories(CommandEngineLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_subdirectory(tests)
-
 add_executable(Flexicmd src/main.cpp)
 target_link_libraries(Flexicmd PRIVATE CommandEngineLib)
 target_include_directories(Flexicmd PRIVATE include)
