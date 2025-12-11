@@ -6,13 +6,16 @@
 
 int main() {
     Subject subj;
-    Wrapper<Subject, int, int, int> wrapper(&subj, &Subject::f3, {{"arg1", 0}, {"arg2", 0}});
     Engine engine;
-    engine.register_command(&wrapper, "command1");
+    auto wrapper = make_wrapper(&subj, &Subject::f3, {
+        std::pair<std::string,std::any>{"arg1",0},
+        std::pair<std::string,std::any>{"arg2",0}
+    });
+    engine.register_command(wrapper, "command1");
 
-    std::string result = engine.execute("command1", {{"arg1", 4}, {"arg2", 5}});
-    std::cout << "Execution result:" << result << std::endl;
+    std::string result = engine.execute("command1", { {"arg1", 4}, {"arg2", 5} });
+    std::cout << "Execution result: " << result << std::endl;
     assert(result == "9");
-    std::cout << "The test was passed successfully!" << std::endl;
+    std::cout << "Test passed." << std::endl;
     return 0;
 }

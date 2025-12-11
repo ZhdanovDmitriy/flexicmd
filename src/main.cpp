@@ -1,21 +1,21 @@
 #include <iostream>
+#include <memory>
 #include "../include/Engine.h"
 #include "../include/Wrapper.h"
 #include "../include/Subject.h"
 
 int main() {
-    Subject s;
+    Subject subj;
     Engine engine;
 
-    Wrapper<Subject, int, int, int> wrap(
-        &s, &Subject::f3,
-        { {"a", 1}, {"b", 2} }
-    );
+    auto wrapper = make_wrapper(&subj, &Subject::f3, {
+        std::pair<std::string,std::any>{"arg1",0},
+        std::pair<std::string,std::any>{"arg2",0}
+    });
 
-    engine.register_command(&wrap, "sum");
+    engine.register_command(wrapper, "command1");
 
-    std::string out = engine.execute("sum", { {"a", 10}, {"b", 20} });
-    std::cout << "Sum = " << out << std::endl;
-
+    std::string out = engine.execute("command1", { { "arg1", 4 }, { "arg2", 5 } });
+    std::cout << out << std::endl;
     return 0;
 }
