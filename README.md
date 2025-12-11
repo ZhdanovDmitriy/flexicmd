@@ -11,25 +11,36 @@
 
 ## Структура проекта
 flexicmd/
+
 ├─ include/ — заголовочные файлы
+
 ├─ src/ — исходники приложения
+
 ├─ tests/ — юнит-тесты
+
 ├─ build/ — папка для сборки CMake
+
 └─ CMakeLists.txt
 
 ## Сборка и запуск программы:
 Создайте папку для сборки в корне проекта:
+
 cd build
 
 Соберите через генератор Visual Studio или свой:
+
 cmake .. -G "Visual Studio 17 2022" -A x64
+
 cmake --build . --config Debug
+
 cmake --build . --config Release
 
 Выберите желаемую версию приложения:
+
 cd Debug | cd Release
 
 Запустите приложение:
+
 Flexicmd.exe
 
 ## Debug и Release
