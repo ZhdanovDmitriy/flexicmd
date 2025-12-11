@@ -67,7 +67,9 @@ private:
             }
         }
         catch (const std::bad_any_cast& e) {
-            throw std::runtime_error("Wrapper: bad_any_cast wrong argument type passed");
+            throw std::runtime_error(
+                std::string("Wrapper: bad_any_cast — wrong argument type passed: ") + e.what()
+            );
         }
     }
 };
