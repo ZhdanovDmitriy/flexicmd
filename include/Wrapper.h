@@ -9,6 +9,7 @@
 #include <tuple>
 #include <utility>
 #include <type_traits>
+#include <algorithm>
 
 template<typename T, typename R, typename... Args>
 class Wrapper : public ICommand {
@@ -27,36 +28,46 @@ public:
             argNames.push_back(p.first);
             argDefaults.push_back(p.second);
         }
-        if (argNames.size() != sizeof...(Args)) {
-            throw std::invalid_argument("Invalid number of arguments in Wrapper");
+
+        constexpr size_t expectedCount = sizeof...(Args);
+        if (argNames.size() != expectedCount) {
+            throw std::invalid_argument("Wrapper: invalid number of arguments. Expected" 
+                + std::to_string(expectedCount) + ", got " 
+                + std::to_string(argNames.size()));
         }
     }
 
     std::string execute(const std::map<std::string, std::any>& args) override {
         std::vector<std::any> finalArgs = argDefaults;
+
         for (auto& [name, value] : args) {
             auto it = std::find(argNames.begin(), argNames.end(), name);
             if (it == argNames.end()) {
-                throw std::runtime_error("Unexpected parameter: " + name);
+                throw std::runtime_error("Wrapper: unexpected parameter: " + name);
             }
             size_t index = std::distance(argNames.begin(), it);
             finalArgs[index] = value;
         }
+
         return callHelper(std::index_sequence_for<Args...>{}, finalArgs);
     }
 
 private:
     template<std::size_t... I>
     std::string callHelper(std::index_sequence<I...>, const std::vector<std::any>& finalArgs) {
-        if constexpr (std::is_void_v<R>) {
-            (object->*method)(std::any_cast<Args>(finalArgs[I])...);
-            return "";
+        try {
+            if constexpr (std::is_void_v<R>) {
+                (object->*method)(std::any_cast<Args>(finalArgs[I])...);
+                return "";
+            } else {
+                R result = (object->*method)(std::any_cast<Args>(finalArgs[I])...);
+                std::ostringstream oss;
+                oss << result;
+                return oss.str();
+            }
         }
-        else {
-            R result = (object->*method)(std::any_cast<Args>(finalArgs[I])...);
-            std::ostringstream oss;
-            oss << result;
-            return oss.str();
+        catch (const std::bad_any_cast& e) {
+            throw std::runtime_error("Wrapper: bad_any_cast wrong argument type passed");
         }
     }
 };
